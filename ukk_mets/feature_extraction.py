@@ -33,7 +33,7 @@ def calculate_features(sitk_image, sitk_mask, label=1, sequence='T1C', bw=0.1):
                 'correctMask': True}
 
     extractor = featureextractor.RadiomicsFeatureExtractor(**settings)
-    if label > 1:
+    if sequence != 'T1C':
         extractor.enableFeatureClassByName('shape', enabled=False)
     extractor.enableImageTypes(Wavelet={}, LoG={'sigma': [1, 2, 3, 4, 5]})
     extracted_features = extractor.execute(sitk_image, sitk_mask, label=label)
@@ -49,6 +49,7 @@ def save_preview():
 # input_path = '/Users/robin/data/UKK_METS'
 # pid = '5704938'
 
+#%%
 def run_extraction(input_path):
     base = Path(input_path)
     pid = base.name
@@ -77,10 +78,9 @@ def run_extraction(input_path):
                 orig_features = calculate_features(sitk_img, combined_seg, label=int(label), sequence=sequence, bw=0.1)
             else:
                 orig_features = calculate_features(sitk_img, sitk_seg, label=int(label), sequence=sequence, bw=0.1)
-            if i == 0:
-                insert_meta(orig_features, pid, bw=0.1, label=label)
             calculated_features.append(orig_features)
-        temp_df = pd.concat(calculated_features, axis=0).reset_index(drop=True)
+        temp_df = pd.concat(calculated_features, axis=1).reset_index(drop=True)
+        insert_meta(temp_df, pid, bw=0.1, label=label)
         dfs_features.append(temp_df)
     final_df = pd.concat(dfs_features, axis=0).reset_index(drop=True)
 
@@ -89,50 +89,3 @@ def run_extraction(input_path):
         features_dir.mkdir(parents=True)
 
     final_df.to_excel(features_dir.joinpath(f'{pid}_features.xlsx'))
-
-
-# PATH = Path('/Volumes/Gutsche/data')
-# PATH_IMAGES = PATH.joinpath('intermediate', 'BRAF', 'BRAF_cropped')
-# PATH_OUTPUT = PATH.joinpath('processed', 'BRAF')
-# PATH_STATUS = PATH.joinpath('raw', 'patient_lists', 'BRAF', 'BRAF_test_set.xlsx')
-#
-# #%%
-# df_status = pd.read_excel(PATH_STATUS, dtype=str)
-# pids = df_status['Forget'].dropna().reset_index(drop=True)
-#
-#
-
-#
-#
-# dfs = []
-#
-# # pid = pids[0]
-# for i, pid in tqdm(enumerate(pids)):
-#     t1_path = str(PATH_IMAGES.joinpath(f'{pid}_T1_image.nii.gz'))
-#     mask_path = str(PATH_IMAGES.joinpath(f'{pid}_T1_mask.nii.gz'))
-#
-#     sitk_t1 = sitk.ReadImage(t1_path)
-#     sitk_mask = sitk.ReadImage(mask_path, sitk.sitkUInt8)
-#     resample = tio.Resample(1)
-#
-#     sitk_t1_res = resample(sitk_t1)
-#     sitk_mask_res = resample(sitk_mask)
-#
-#     layer = int(sitk_t1_res.GetDepth()/2)
-#     fig, axs = plt.subplots(nrows=1, ncols=2)
-#     axs[0].imshow(sitk.GetArrayFromImage(sitk_t1_res)[:, :, layer], cmap='gray')
-#     axs[0].set_title('t1_orig')
-#     axs[1].imshow(sitk.GetArrayFromImage(sitk_mask_res)[:, :, layer], cmap='gray')
-#     axs[1].set_title('mask_orig')
-#     plt.savefig(PATH_OUTPUT.joinpath('plots', 'cropped_transformed', f'{pid}.png'), dpi=300)
-#
-#     t1_features_orig = extract_features(sitk_t1_res, sitk_mask_res)
-#     df_t1 = pd.DataFrame()
-#     df_t1 = df_t1.from_dict(t1_features_orig, orient='index').T
-#     df_t1.insert(0, 'pid', pid)
-#     dfs.append(df_t1)
-#
-# final_df = pd.concat(dfs, ignore_index=True)
-# final_df.to_excel(PATH_OUTPUT.joinpath('features', 'rsmp1mm_bw010_test_set_t1_lastpid.xlsx'))
-
-
