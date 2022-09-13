@@ -1,8 +1,3 @@
-from nipype import config
-cfg = dict(logging=dict(workflow_level='DEBUG', utils_level='DEBUG', interface_level='DEBUG'),
-           execution={'stop_on_first_crash': False})
-config.update_config(cfg)
-
 import argparse
 from ukk_mets.preprocess import run_preprocess
 from ukk_mets.feature_extraction import run_extraction
@@ -28,35 +23,5 @@ def main():
         run_prediction(input_path)
 
 
-# def predict():
-#     parser = argparse.ArgumentParser(description="Test - Bla \n Bla Bla \n 12345")
-#         #
-#         # parser.add_argument('-input_t1c', type=str, required=True, help='path to patient folder with dicom files')
-#         # parser.add_argument('-input_t2', type=str, required=True, help='path to patient folder with dicom files')
-#         # parser.add_argument('-input_flair', type=str, required=True, help='path to patient folder with dicom files')
-#         #
-#
-#     parser.add_argument('-input_nifties', type=str, required=True, help='path to patient folder with niftie files')
-#
-#
-#     # parser.add_argument('-output', type=str, required=True, help='path to patient folder')
-#     # Use a breakpoint in the code line below to debug your script.
-#
-#     args = parser.parse_args()
-#     path_input = args.input
-#
-#     print(f'{path_input}')
-
-
-# Press the green button in the gutter to run the script.
 if __name__ == '__main__':
-    # preprocess_user_input = input('Preprocess Y/N?')
     main()
-
-    # if preprocess_user_input == 'Y' or preprocess_user_input == 'y':
-    #     preprocess()
-    # else:
-    #     predict()
-    # print_hi('PyCharm')
-
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/

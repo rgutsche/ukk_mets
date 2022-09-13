@@ -1,8 +1,3 @@
-from nipype import config
-cfg = dict(logging=dict(workflow_level='DEBUG', utils_level='DEBUG', interface_level='DEBUG'),
-           execution={'stop_on_first_crash': False})
-config.update_config(cfg)
-
 from nipype.interfaces import fsl
 from nipype.interfaces.ants import N4BiasFieldCorrection
 from nipype.interfaces.dcm2nii import Dcm2niix
@@ -29,7 +24,7 @@ def convert_to_nii(dicom_dir_path, out_dir_path, out_path):
     converter.run()
 
 
-def registration(in_path, ref_path, out_path):
+def registration(in_path, ref_path, out_path, out_path_mat):
     """
     Registration image to another image (for example T1-km to T1-native)
     :param in_path: str or pathlike object | nifti file that should be registered
@@ -48,7 +43,9 @@ def registration(in_path, ref_path, out_path):
     flt.inputs.reference = ref_path  # File that should be registered to
     flt.inputs.output_type = 'NIFTI_GZ'
     flt.inputs.out_file = out_path
+    flt.inputs.out_matrix_file = out_path_mat
     flt.run()
+
 
 def brain_segmentation(in_path, out_path, device=0):
     """
@@ -59,6 +56,7 @@ def brain_segmentation(in_path, out_path, device=0):
     :return: image crop to brain mask, brain mask
     """
     run_hd_bet(in_path, out_path, device=device)
+
 
 def crop_to_mask(in_path, mask_path, out_path):
     """

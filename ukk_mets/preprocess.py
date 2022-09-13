@@ -1,11 +1,6 @@
-from nipype import config
-cfg = dict(logging=dict(workflow_level='DEBUG', utils_level='DEBUG', interface_level='DEBUG'),
-           execution={'stop_on_first_crash': False})
-config.update_config(cfg)
-
 from pathlib import Path
 from ukk_mets.util import convert_to_nii, registration, brain_segmentation, crop_to_mask, n4_bias_field_correction
-
+import shutil
 
 def run_preprocess(input_path):
     base = Path(input_path)
@@ -53,7 +48,8 @@ def run_preprocess(input_path):
         in_file = base.joinpath('NIFTI', sequence, f'{pid}_{sequence}.nii.gz')
         ref_file = base.joinpath('NIFTI', 'T1C', f'{pid}_T1C.nii.gz')
         out_file = base.joinpath('NIFTI', sequence, f'{pid}_{sequence}_co.nii.gz')
-        registration(str(in_file), str(ref_file), str(out_file))
+        out_file_mat = base.joinpath('NIFTI', sequence, f'{pid}_{sequence}_co_mat.nii.gz')
+        registration(str(in_file), str(ref_file), str(out_file), str(out_file_mat))
 
     print('All sequences were registered to T1C!')
 
@@ -94,5 +90,14 @@ def run_preprocess(input_path):
 
         # 6) Rename files to nnU-Net format
         out_file.rename(out_file.parent.joinpath(f'{pid}_000{i +1}.nii.gz'))
+
+    # final_dir =  base.joinpath(
+    # if not final_dir.is_dir():
+    #     final_dir.mkdir(parents=True)
+
+    sequences = ['T1C', 'T2', 'FLAIR']
+    for i, sequence in enumerate(sequences):
+        shutil.move(base.joinpath('NIFTI', sequence, f'{pid}_000{i +1}.nii.gz'),
+                    base)
 
     print(f'PID: {pid} | N4BiasFieldCorrection done')
