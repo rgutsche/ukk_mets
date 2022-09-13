@@ -49,7 +49,7 @@ def run_extraction(input_path):
     pid = base.name
 
     segmentation = base.joinpath('IMG_DATA', f'{pid}_tum_seg.nii.gz')
-    sitk_seg = sitk.ReadImage(str(segmentation))
+    sitk_seg = sitk.ReadImage(str(segmentation),  sitk.sitkUInt8)
 
     segmentation_array = sitk.GetArrayFromImage(sitk_seg)
     labels = list(np.unique(segmentation_array)[1:])
