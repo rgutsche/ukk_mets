@@ -20,12 +20,11 @@ def main():
 
     if preprocess_user_input == 'Y' or preprocess_user_input == 'y':
         run_preprocess(input_path)
+        return
 
     if extract == 'Y' or extract == 'y':
         run_extraction(input_path)
 
-        # print('| Skip preprocessing and start feature extraction |')
-        # print(f'| Use this path for prediction: {input_path}')
     run_prediction(input_path, age)
 
 

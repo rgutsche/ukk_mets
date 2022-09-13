@@ -55,16 +55,20 @@ Data should be in the following structure (IMPORTANT! Add tumor segmentation in 
 ### Terminal commands
 Terminal arguments:
 
-- "-preprocess" must be 'Y' or 'N' if dicom files should be converted to nifti, registered and n4-bias-field corrected
-- "-input_path" must be the path to the patient folder 
+- '-preprocess' must be 'Y' or 'N' if dicom files should be converted to nifti, registered and n4-bias-field corrected
+- '-feat_extract' must be 'Y' or 'N' if features should be extracted
+- '-age' patient age for the prediction
+- '-input_path' must be the path to the patient folder 
 
 Example:
-
 ##### Only preprocess 
-``` main.py -preprocess Y -input /Users/robin/data/PID ```
+``` main.py -preprocess Y -feat_extract N -age 0 -input_path /Users/robin/data/PID ```
+
+##### Prediction and Feature extraction
+``` main.py -preprocess N -feat_extract Y -age patient_age -input_path /Users/robin/data/PID ```
 
 ##### Only prediction
-``` main.py -preprocess N -input /Users/robin/data/PID ```
+``` main.py -preprocess N -feat_extract N -age patient_age -input_path /Users/robin/data/PID ```
 
 ### Output
 ##### Final output
@@ -74,8 +78,8 @@ The final output will create feature folder containing radiomics features as Exc
     ├── IMG_DATA
     ├── FEATURES
             ├── PID_1_features.xlsx
-    ├── PREDICTION
             ├── PID_1_preview_tumor.png
+    ├── PREDICTION
             ├── PID_1_prediction.xlsx
 └── ...
 ```

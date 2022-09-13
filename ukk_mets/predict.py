@@ -8,7 +8,6 @@ import numpy as np
 # input_path = '/Users/robin/data/ukk_mets/5704938'
 # age = 70
 
-
 def run_prediction(input_path, age):
     base = Path(input_path)
     pid = base.name
@@ -40,5 +39,5 @@ def run_prediction(input_path, age):
     if not output.is_dir():
         output.mkdir(parents=True)
 
-    pd.DataFrame(dic).to_excel(output.joinpath(f'{pid}_prediction.xlsx'))
+    pd.Series(dic).to_excel(output.joinpath(f'{pid}_prediction.xlsx'))
 
