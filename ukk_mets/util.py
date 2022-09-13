@@ -1,5 +1,5 @@
 from nipype import config
-cfg = dict(logging=dict(workflow_level='DEBUG'),
+cfg = dict(logging=dict(workflow_level='DEBUG', utils_level='DEBUG', interface_level='DEBUG'),
            execution={'stop_on_first_crash': False})
 config.update_config(cfg)
 

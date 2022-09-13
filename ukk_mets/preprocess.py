@@ -1,5 +1,5 @@
 from nipype import config
-cfg = dict(logging=dict(workflow_level='DEBUG'),
+cfg = dict(logging=dict(workflow_level='DEBUG', utils_level='DEBUG', interface_level='DEBUG'),
            execution={'stop_on_first_crash': False})
 config.update_config(cfg)
 
@@ -29,7 +29,7 @@ def run_preprocess(input_path):
         try:
             files = [x for x in out_dir.glob(f'{sequence}*')]
             if len(files) > 1:
-                multiple = True
+                # multiple = True
                 print(f'Warning! More than one file were generated for patient: {pid} | sequence: {sequence}')
             file = files[0]
         except IndexError:
@@ -38,9 +38,9 @@ def run_preprocess(input_path):
 
         file.rename(out_dir.joinpath(f'{pid}_{sequence}.nii.gz'))
 
-        if multiple:
-            file = files[1]
-            file.rename(out_dir.joinpath(f'{pid}_{sequence}_2.nii.gz'))
+        # if multiple:
+        #     file = files[1]
+        #     file.rename(out_dir.joinpath(f'{pid}_{sequence}_2.nii.gz'))
 
     print('All sequences were converted to nifti files!')
 
