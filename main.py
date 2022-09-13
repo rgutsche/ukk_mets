@@ -1,3 +1,8 @@
+from nipype import config
+cfg = dict(logging=dict(workflow_level='DEBUG'),
+           execution={'stop_on_first_crash': False})
+config.update_config(cfg)
+
 import argparse
 from ukk_mets.preprocess import run_preprocess
 from ukk_mets.feature_extraction import run_extraction

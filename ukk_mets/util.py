@@ -1,12 +1,13 @@
+from nipype import config
+cfg = dict(logging=dict(workflow_level='DEBUG'),
+           execution={'stop_on_first_crash': False})
+config.update_config(cfg)
+
 from nipype.interfaces import fsl
 from nipype.interfaces.ants import N4BiasFieldCorrection
 from nipype.interfaces.dcm2nii import Dcm2niix
 from nipype.interfaces.fsl import ApplyMask
 from HD_BET.run import run_hd_bet
-from nipype import config
-cfg = dict(logging=dict(workflow_level='DEBUG'),
-           execution={'stop_on_first_crash': False})
-config.update_config(cfg)
 
 
 def convert_to_nii(dicom_dir_path, out_dir_path, out_path):
