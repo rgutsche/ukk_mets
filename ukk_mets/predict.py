@@ -34,5 +34,11 @@ def run_prediction(input_path, age):
     predictions = clf.predict(features)
     probabilities = clf.predict_proba(features)
 
-    return predictions
+    dic = {'pid': pid, 'pred': int(predictions.item()), 'prob_wt': probabilities[0][0], 'prob_mut': probabilities[0][1]}
+
+    output = base.joinpath('PREDICTION')
+    if not output.is_dir():
+        output.mkdir(parents=True)
+
+    pd.DataFrame(dic).to_excel(output.joinpath(f'{pid}_prediction.xlsx'))
 
