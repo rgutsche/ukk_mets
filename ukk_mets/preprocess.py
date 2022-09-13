@@ -4,7 +4,7 @@ from ukk_mets.util import convert_to_nii, registration, brain_segmentation, crop
 
 def run_preprocess(input_path):
     base = Path(input_path)
-    pid = base.parent
+    pid = base.parent.name
 
     print(f'Start preprocessing for patient: {pid}')
 
