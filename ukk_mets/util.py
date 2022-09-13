@@ -1,6 +1,8 @@
 from nipype.interfaces import fsl
 from nipype.interfaces.ants import N4BiasFieldCorrection
 from nipype.interfaces.dcm2nii import Dcm2niix
+from nipype.interfaces.fsl import ApplyMask
+from HD_BET.run import run_hd_bet
 
 
 def convert_to_nii(dicom_dir_path, out_dir_path, out_path):
@@ -41,6 +43,30 @@ def registration(in_path, ref_path, out_path):
     flt.inputs.output_type = 'NIFTI_GZ'
     flt.inputs.out_file = out_path
     flt.run()
+
+def brain_segmentation(in_path, out_path, device=0):
+    """
+    Brain segmentation using HD-BET
+    :param in_path: str |
+    :param out_path: str |
+    :param device_id: either int for device id or 'cpu'
+    :return: image crop to brain mask, brain mask
+    """
+    run_hd_bet(in_path, out_path, device=device)
+
+def crop_to_mask(in_path, mask_path, out_path):
+    """
+    Use HD-BET brain segmentation mask for all sequences
+    :param in_path:
+    :param mask_path:
+    :param out_path:
+    :return:
+    """
+    mask = ApplyMask()
+    mask.inputs.in_file = in_path
+    mask.inputs.mask_file = mask_path
+    mask.inputs.out_file = out_path
+    mask.run()
 
 
 def n4_bias_field_correction(in_path, out_path, brain_mask_path):
