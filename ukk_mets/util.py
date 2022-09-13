@@ -20,6 +20,7 @@ def convert_to_nii(dicom_dir_path, out_dir_path, out_path):
     converter.inputs.compress = 'y'
     converter.inputs.output_dir = out_dir_path
     converter.inputs.out_filename = f'{out_path}'
+    converter.inputs.verbose = False
     converter.run()
 
 

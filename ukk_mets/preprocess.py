@@ -22,7 +22,10 @@ def run_preprocess(input_path):
         convert_to_nii(dicom_dir, out_dir, out_file)
 
         try:
-            file = [x for x in out_dir.glob(f'{sequence}*')][0]
+            files = [x for x in out_dir.glob(f'{sequence}*')]
+            if len(files) > 1:
+                print(f'Warning! More than one file were generated for patient: {pid} | sequence: {sequence}')
+            file = files[0]
         except IndexError:
             print(f'Error! Files not converted for patient: {pid} | sequence: {sequence}')
             continue
@@ -40,7 +43,7 @@ def run_preprocess(input_path):
         in_file = base.joinpath('NIFTI', f'{pid}_{sequence}.nii.gz')
         ref_file = base.joinpath('NIFTI', f'{pid}_T1C.nii.gz')
         out_file = base.joinpath('NIFTI', f'{pid}_{sequence}_co.nii.gz')
-        registration(in_file, ref_file, out_file)
+        registration(str(in_file), str(ref_file), str(out_file))
 
     print('All sequences were registered to T1C!')
 
