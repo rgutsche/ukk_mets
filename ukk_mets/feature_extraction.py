@@ -72,7 +72,7 @@ def run_extraction(input_path):
             if label == 4:
                 orig_features = calculate_features(sitk_img, combined_seg, label=label, sequence=sequence, bw=0.1)
             else:
-                orig_features = calculate_features(sitk_img, sitk_seg, label=label, sequence=sequence, bw=0.1)
+                orig_features = calculate_features(sitk_img, sitk_seg, label=int(label), sequence=sequence, bw=0.1)
             insert_meta(orig_features, pid, bw=0.1, label=label)
             calculated_features.append(orig_features)
 
