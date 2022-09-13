@@ -1,12 +1,91 @@
+from pathlib import Path
+import pandas as pd
+import numpy as np
 import SimpleITK as sitk
+from tqdm import tqdm
 from radiomics import featureextractor
 import logging
 
-logger = logging.getLogger("radiomic.glcm")
+logger = logging.getLogger("radiomics.glcm")
 logger.setLevel(logging.ERROR)
 
+#%%
+
+
+def remove_diagnostic_features(feature_dic):
+    for x in [key for key, value in feature_dic.items() if key.startswith('diagnostics_')]:
+        feature_dic.pop(x)
+    return feature_dic
+
+
+def insert_meta(df, pid, bw, label):
+    df.insert(0, 'pid', pid)
+    df.insert(1, 'bin_width', bw)
+    df.insert(2, 'Label', label)
+
+
+def calculate_features(sitk_image, sitk_mask, label=1, sequence='T1C', bw=0.1):
+
+    settings = {'normalize': True,
+                'resample': [1, 1, 1],
+                'binWidth': bw,
+                'preCrop': True,
+                'correctMask': True}
+
+    extractor = featureextractor.RadiomicsFeatureExtractor(**settings)
+    extractor.enableImageTypes(Wavelet={}, LoG={'sigma': [1, 2, 3, 4, 5]})
+    extracted_features = extractor.execute(sitk_image, sitk_mask, label=label)
+    extracted_features = remove_diagnostic_features(extracted_features)
+    extracted_features = dict([f'{sequence}_' + key, float(value)] for key, value in extracted_features.items())
+    features = pd.DataFrame().from_dict(extracted_features, orient='index').T
+    return features
+
+
+# input_path = '/Users/robin/data/UKK_METS'
+# pid = '5704938'
+
 def run_extraction(input_path):
-    pass
+    base = Path(input_path)
+    pid = base.name
+
+    segmentation = base.joinpath('IMG_DATA', f'{pid}_tum_seg.nii.gz')
+    sitk_seg = sitk.ReadImage(str(segmentation))
+
+    segmentation_array = sitk.GetArrayFromImage(sitk_seg)
+    labels = list(np.unique(segmentation_array)[1:])
+    if len(labels) > 1:
+        labels.insert(len(labels), 4)
+        for label in labels[:-1]:
+            segmentation_array[segmentation_array == label] = 4
+        combined_seg = sitk.GetImageFromArray(segmentation_array)
+        combined_seg.CopyInformation(sitk_seg)
+
+    sequences = ['T1C', 'T2', 'FLAIR']
+
+    dfs_features = []
+    for label in labels:
+        calculated_features = []
+        for i, sequence in tqdm(enumerate(sequences)):
+            image = base.joinpath('IMG_DATA', f'{pid}_000{i+1}_orig.nii.gz')
+            sitk_img = sitk.ReadImage(str(image))
+
+            if label == 4:
+                orig_features = calculate_features(sitk_img, combined_seg, label=label, sequence=sequence, bw=0.1)
+            else:
+                orig_features = calculate_features(sitk_img, sitk_seg, label=label, sequence=sequence, bw=0.1)
+            insert_meta(orig_features, pid, bw=0.1, label=label)
+            calculated_features.append(orig_features)
+
+        temp_df = pd.concat(calculated_features, axis=0).reset_index(drop=True)
+        dfs_features.append(temp_df)
+    final_df = pd.concat(dfs_features, axis=0).reset_index(drop=True)
+
+    features_dir = base.joinpath('FEATURES')
+    if not features_dir.is_dir():
+        features_dir.mkdir(parents=True)
+
+    final_df.to_excel(features_dir.joinpath(f'{pid}_features.xlsx'))
+
 
 # PATH = Path('/Volumes/Gutsche/data')
 # PATH_IMAGES = PATH.joinpath('intermediate', 'BRAF', 'BRAF_cropped')
@@ -18,24 +97,7 @@ def run_extraction(input_path):
 # pids = df_status['Forget'].dropna().reset_index(drop=True)
 #
 #
-# def extract_features(t1_array, mask_array):
-#     settings = {'normalize': False,
-#                 'binWidth': 0.1,
-#                 'preCrop': True,
-#                 'correctMask': True}
-#
-#     extractor = featureextractor.RadiomicsFeatureExtractor(**settings)
-#
-#     extractor.enableImageTypes(Wavelet={}, LoG={'sigma': [1, 2, 3, 4, 5]})
-#
-#     feats_t1 = extractor.execute(t1_array, mask_array, label=1)
-#
-#     for x in [key for key, value in feats_t1.items() if key.startswith('diagnostics_')]:
-#         feats_t1.pop(x)
-#
-#     t1_features = dict([f'T1_'+ key, float(value)] for key, value in feats_t1.items())
-#
-#     return t1_features
+
 #
 #
 # dfs = []

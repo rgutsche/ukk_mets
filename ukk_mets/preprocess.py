@@ -2,6 +2,7 @@ from pathlib import Path
 from ukk_mets.util import convert_to_nii, registration, brain_segmentation, crop_to_mask, n4_bias_field_correction
 import shutil
 
+
 def run_preprocess(input_path):
     base = Path(input_path)
     pid = base.name
@@ -90,14 +91,23 @@ def run_preprocess(input_path):
 
         # 6) Rename files to nnU-Net format
         out_file.rename(out_file.parent.joinpath(f'{pid}_000{i +1}.nii.gz'))
+    print(f'PID: {pid} | N4BiasFieldCorrection done')
 
-    # final_dir =  base.joinpath(
-    # if not final_dir.is_dir():
-    #     final_dir.mkdir(parents=True)
+    # 7) Move files to final location
+    final_dir = base.joinpath('IMG_DATA')
+    if not final_dir.is_dir():
+        final_dir.mkdir(parents=True)
 
     sequences = ['T1C', 'T2', 'FLAIR']
     for i, sequence in enumerate(sequences):
         shutil.move(base.joinpath('NIFTI', sequence, f'{pid}_000{i +1}.nii.gz'),
-                    base)
+                    final_dir)
+
+    temp_dir = base.joinpath('TEMP')
+    if not temp_dir.is_dir():
+        temp_dir.mkdir(parents=True)
+
+    shutil.move(base.joinpath('NIFTI'), temp_dir)
+    shutil.move(base.joinpath('DICOM'), temp_dir)
 
     print(f'PID: {pid} | N4BiasFieldCorrection done')
