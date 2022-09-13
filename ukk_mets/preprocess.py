@@ -50,7 +50,7 @@ def run_preprocess(input_path):
     for sequence in sequences:
         print(f'PID: {pid} | Registration {sequence} to T1C')
 
-        in_file = base.joinpath('NIFTI', sequence, '{pid}_{sequence}.nii.gz')
+        in_file = base.joinpath('NIFTI', sequence, f'{pid}_{sequence}.nii.gz')
         ref_file = base.joinpath('NIFTI', sequence, f'{pid}_T1C.nii.gz')
         out_file = base.joinpath('NIFTI', sequence, f'{pid}_{sequence}_co.nii.gz')
         registration(str(in_file), str(ref_file), str(out_file))
