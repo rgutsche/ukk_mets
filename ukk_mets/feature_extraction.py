@@ -66,7 +66,7 @@ def run_extraction(input_path):
     for label in labels:
         calculated_features = []
         for i, sequence in tqdm(enumerate(sequences)):
-            image = base.joinpath('IMG_DATA', f'{pid}_000{i+1}_orig.nii.gz')
+            image = base.joinpath('IMG_DATA', f'{pid}_000{i+1}.nii.gz')
             sitk_img = sitk.ReadImage(str(image))
 
             if label == 4:
