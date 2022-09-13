@@ -5,7 +5,7 @@ This repository predicts the genotype and histology of brain metastases
 
 ## Installation
 Clone this repository:
-`git clone git@github.com:rgutsche/ukk_mets.git`
+`git clone https://github.com/rgutsche/ukk_mets.git`
 
 ## How to use it
 

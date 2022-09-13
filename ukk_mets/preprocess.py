@@ -24,7 +24,7 @@ def run_preprocess(input_path):
 
         logging.warning(f'PID: {pid}. convert {sequence} to nifti')
 
-        convert_to_nii(dicom_dir, out_dir, out_file)
+        convert_to_nii(str(dicom_dir), str(out_dir), str(out_file))
 
         try:
             file = [x for x in out_dir.glob(f'{sequence}*')][0]
