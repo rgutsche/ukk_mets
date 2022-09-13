@@ -33,6 +33,8 @@ def calculate_features(sitk_image, sitk_mask, label=1, sequence='T1C', bw=0.1):
                 'correctMask': True}
 
     extractor = featureextractor.RadiomicsFeatureExtractor(**settings)
+    if label > 1:
+        extractor.enableFeatureClassByName('shape', enabled=False)
     extractor.enableImageTypes(Wavelet={}, LoG={'sigma': [1, 2, 3, 4, 5]})
     extracted_features = extractor.execute(sitk_image, sitk_mask, label=label)
     extracted_features = remove_diagnostic_features(extracted_features)
@@ -40,6 +42,9 @@ def calculate_features(sitk_image, sitk_mask, label=1, sequence='T1C', bw=0.1):
     features = pd.DataFrame().from_dict(extracted_features, orient='index').T
     return features
 
+
+def save_preview():
+    pass
 
 # input_path = '/Users/robin/data/UKK_METS'
 # pid = '5704938'
@@ -68,14 +73,13 @@ def run_extraction(input_path):
         for i, sequence in tqdm(enumerate(sequences)):
             image = base.joinpath('IMG_DATA', f'{pid}_000{i+1}.nii.gz')
             sitk_img = sitk.ReadImage(str(image))
-
             if label == 4:
-                orig_features = calculate_features(sitk_img, combined_seg, label=label, sequence=sequence, bw=0.1)
+                orig_features = calculate_features(sitk_img, combined_seg, label=int(label), sequence=sequence, bw=0.1)
             else:
                 orig_features = calculate_features(sitk_img, sitk_seg, label=int(label), sequence=sequence, bw=0.1)
-            insert_meta(orig_features, pid, bw=0.1, label=label)
+            if i == 0:
+                insert_meta(orig_features, pid, bw=0.1, label=label)
             calculated_features.append(orig_features)
-
         temp_df = pd.concat(calculated_features, axis=0).reset_index(drop=True)
         dfs_features.append(temp_df)
     final_df = pd.concat(dfs_features, axis=0).reset_index(drop=True)

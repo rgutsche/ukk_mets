@@ -7,20 +7,21 @@ from ukk_mets.predict import run_prediction
 def main():
     parser = argparse.ArgumentParser(description="Prediction of Metastases Genotype with Radiomics")
     parser.add_argument('-preprocess', type=str, required=True, help='"Y" or "N" if files need to be preprocessed')
+    parser.add_argument('-age', type=str, required=True, help='patient age important for the prediction')
     parser.add_argument('-input_path', type=str, required=True, help='path to patient folder with dicom or nifti files')
 
     args = parser.parse_args()
 
     preprocess_user_input = args.preprocess
     input_path = args.input_path
-
+    age = args.age
     if preprocess_user_input == 'Y' or preprocess_user_input == 'y':
         run_preprocess(input_path)
     else:
         print('| Skip preprocessing and start feature extraction |')
         run_extraction(input_path)
         # print(f'| Use this path for prediction: {input_path}')
-        run_prediction(input_path)
+        run_prediction(input_path, age)
 
 
 if __name__ == '__main__':
