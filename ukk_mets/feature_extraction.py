@@ -75,12 +75,14 @@ def run_extraction(input_path):
         for i, sequence in tqdm(enumerate(sequences)):
             image = base.joinpath('IMG_DATA', f'{pid}_000{i+1}.nii.gz')
             print('Bis hierhin ok!')
-            sitk_img = sitk.ReadImage(str(image))
+            sitk_img = sitk.ReadImage(str(image), sitk.sitkUInt8)
             if label == 4:
                 orig_features = calculate_features(sitk_img, combined_seg, label=int(label), sequence=sequence, bw=0.1)
             else:
                 print('Bis hier auch ok!')
                 orig_features = calculate_features(sitk_img, sitk_seg, label=int(label), sequence=sequence, bw=0.1)
+                print('Extraction klappt')
+
             calculated_features.append(orig_features)
         temp_df = pd.concat(calculated_features, axis=1).reset_index(drop=True)
         insert_meta(temp_df, pid, bw=0.1, label=label)
