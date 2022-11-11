@@ -85,6 +85,7 @@ def run_extraction(input_path):
     #             orig_features = calculate_features(sitk_img, sitk_seg, label=int(label), sequence=sequence, bw=0.1)
     #             print('Extraction klappt')
 
+
     sequences = ['T1C', 'T2', 'FLAIR']
     labels = [1, 2, 3]
 
@@ -94,13 +95,54 @@ def run_extraction(input_path):
         for i, sequence in tqdm(enumerate(sequences)):
             image = base.joinpath('IMG_DATA', f'{pid}_000{i+1}.nii.gz')
             sitk_img = sitk.ReadImage(str(image))
-            orig_features = calculate_features(sitk_img, sitk_seg, label=int(label), sequence=sequence, bw=0.1)
+            orig_features = calculate_features(sitk_img, sitk_seg, label=1, sequence=sequence, bw=0.1)
             calculated_features.append(orig_features)
         temp_df = pd.concat(calculated_features, axis=1).reset_index(drop=True)
         insert_meta(temp_df, pid, bw=0.1, label=label)
         dfs_features.append(temp_df)
     final_df = pd.concat(dfs_features, axis=0).reset_index(drop=True)
 
+    # settings = {'normalize': True,
+    #             'resample': [ 1, 1, 1 ],
+    #             'binWidth': 0.1,
+    #             'preCrop': True,
+    #             'correctMask': True}
+    #
+    # extractor = featureextractor.RadiomicsFeatureExtractor(**settings)
+    # # extractor.enableFeatureClassByName('shape', enabled=False)
+    # extractor.enableImageTypes(Wavelet={}, LoG={'sigma': [ 1, 2, 3, 4, 5 ]})
+    #
+    # def remove_diagnostic_features(feature_dic):
+    #     for x in [ key for key, value in feature_dic.items() if key.startswith('diagnostics_') ]:
+    #         feature_dic.pop(x)
+    #     return feature_dic
+    #
+    # # 3) Extract Features
+    # extracted_features = extractor.execute(sitk_img, sitk_mask, label=1)
+    #
+    # extracted_features = remove_diagnostic_features(extracted_features)
+    # extracted_features = dict([ 'T1KM_' + key, float(value) ] for key, value in extracted_features.items())
+    # extracted_features = pd.DataFrame().from_dict(extracted_features, orient='index').T
+    #
+    # extracted_features.to_excel(base.joinpath(pid, f'{pid}_features_v2.xlsx'))
+    #
+    #
+    # sequences = ['T1C', 'T2', 'FLAIR']
+    # labels = [1, 2, 3]
+    #
+    # dfs_features = []
+    # for label in labels:
+    #     calculated_features = []
+    #     for i, sequence in tqdm(enumerate(sequences)):
+    #         image = base.joinpath('IMG_DATA', f'{pid}_000{i+1}.nii.gz')
+    #         sitk_img = sitk.ReadImage(str(image))
+    #         orig_features = calculate_features(sitk_img, sitk_seg, label=int(label), sequence=sequence, bw=0.1)
+    #         calculated_features.append(orig_features)
+    #     temp_df = pd.concat(calculated_features, axis=1).reset_index(drop=True)
+    #     insert_meta(temp_df, pid, bw=0.1, label=label)
+    #     dfs_features.append(temp_df)
+    # final_df = pd.concat(dfs_features, axis=0).reset_index(drop=True)
+    #
     features_dir = base.joinpath('FEATURES')
     if not features_dir.is_dir():
         features_dir.mkdir(parents=True)
