@@ -1,7 +1,7 @@
-import argparse
 from ukk_mets.preprocess import run_preprocess
 from ukk_mets.feature_extraction import run_extraction
 from ukk_mets.predict import run_prediction
+import argparse
 
 
 def main():
