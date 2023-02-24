@@ -68,9 +68,9 @@ def crop_to_mask(in_path, mask_path, out_path):
     """
     mask = ApplyMask()
     mask.inputs.in_file = in_path
+    mask.inputs.output_type = 'NIFTI_GZ'
     mask.inputs.mask_file = mask_path
     mask.inputs.out_file = out_path
-    mask.inputs.output_type = 'NIFTI_GZ'
     mask.run()
 
 
