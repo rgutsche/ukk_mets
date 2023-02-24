@@ -7,32 +7,32 @@ def run_preprocess(input_path):
     base = Path(input_path)
     pid = base.name
 
-    print(f'Start preprocessing for patient: {pid}')
-
-    # 1) Convert to Nifti
-    sequences = ['T1C', 'T2', 'FLAIR']
-    for sequence in sequences:
-        dicom_dir = base.joinpath('DICOM', sequence)
-        out_dir = base.joinpath('NIFTI', sequence)
-        out_file = f'{sequence}'
-
-        if not out_dir.is_dir():
-            out_dir.mkdir(parents=True)
-
-        print(f'PID: {pid} | Convert {sequence} to nifti')
-        convert_to_nii(dicom_dir, out_dir, out_file)
-
-        try:
-            files = [x for x in out_dir.glob(f'{sequence}*')]
-            if len(files) > 1:
-                # multiple = True
-                print(f'Warning! More than one file were generated for patient: {pid} | sequence: {sequence}')
-            file = files[0]
-        except IndexError:
-            print(f'Error! Files not converted for patient: {pid} | sequence: {sequence}')
-            continue
-
-        file.rename(out_dir.joinpath(f'{pid}_{sequence}.nii.gz'))
+    # print(f'Start preprocessing for patient: {pid}')
+    #
+    # # 1) Convert to Nifti
+    # sequences = ['T1C', 'T2', 'FLAIR']
+    # for sequence in sequences:
+    #     dicom_dir = base.joinpath('DICOM', sequence)
+    #     out_dir = base.joinpath('NIFTI', sequence)
+    #     out_file = f'{sequence}'
+    #
+    #     if not out_dir.is_dir():
+    #         out_dir.mkdir(parents=True)
+    #
+    #     print(f'PID: {pid} | Convert {sequence} to nifti')
+    #     convert_to_nii(dicom_dir, out_dir, out_file)
+    #
+    #     try:
+    #         files = [x for x in out_dir.glob(f'{sequence}*')]
+    #         if len(files) > 1:
+    #             # multiple = True
+    #             print(f'Warning! More than one file were generated for patient: {pid} | sequence: {sequence}')
+    #         file = files[0]
+    #     except IndexError:
+    #         print(f'Error! Files not converted for patient: {pid} | sequence: {sequence}')
+    #         continue
+    #
+    #     file.rename(out_dir.joinpath(f'{pid}_{sequence}.nii.gz'))
 
         # if multiple:
         #     file = files[1]
@@ -43,16 +43,16 @@ def run_preprocess(input_path):
     # 2) Registration
     sequences = ['T2', 'FLAIR']
 
-    for sequence in sequences:
-        print(f'PID: {pid} | Registration {sequence} to T1C')
-
-        in_file = base.joinpath('NIFTI', sequence, f'{pid}_{sequence}.nii.gz')
-        ref_file = base.joinpath('NIFTI', 'T1C', f'{pid}_T1C.nii.gz')
-        out_file = base.joinpath('NIFTI', sequence, f'{pid}_{sequence}_co.nii.gz')
-        out_file_mat = base.joinpath('NIFTI', sequence, f'{pid}_{sequence}_co_mat.nii.gz')
-        registration(str(in_file), str(ref_file), str(out_file), str(out_file_mat))
-
-    print('All sequences were registered to T1C!')
+    # for sequence in sequences:
+    #     print(f'PID: {pid} | Registration {sequence} to T1C')
+    #
+    #     in_file = base.joinpath('NIFTI', sequence, f'{pid}_{sequence}.nii.gz')
+    #     ref_file = base.joinpath('NIFTI', 'T1C', f'{pid}_T1C.nii.gz')
+    #     out_file = base.joinpath('NIFTI', sequence, f'{pid}_{sequence}_co.nii.gz')
+    #     out_file_mat = base.joinpath('NIFTI', sequence, f'{pid}_{sequence}_co_mat.nii.gz')
+    #     registration(str(in_file), str(ref_file), str(out_file), str(out_file_mat))
+    #
+    # print('All sequences were registered to T1C!')
 
     # 3) Brain Segmentation
     print(f'PID: {pid} | Brain segmentation T1C')
@@ -74,6 +74,10 @@ def run_preprocess(input_path):
         in_file = base.joinpath('NIFTI', sequence, f'{pid}_{sequence}_co.nii.gz')
         out_file = base.joinpath('NIFTI', sequence, f'{pid}_{sequence}_hdbet.nii.gz')
         crop_to_mask(in_file, mask_file, out_file)
+
+        if not out_file == base.joinpath('NIFTI', sequence, f'{pid}_{sequence}_hdbet.nii.gz'):
+            out_file.parent.joinpath(f'{pid}_{sequence}_hdbet.nii').rename(
+                out_file.parent.joinpath(f'{pid}_{sequence}_hdbet.nii.gz'))
 
     print(f'PID: {pid} | Application of brain segmentation mask done')
 
