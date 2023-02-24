@@ -1,9 +1,9 @@
+from radiomics import featureextractor
 from pathlib import Path
 import pandas as pd
 import numpy as np
 import SimpleITK as sitk
 from tqdm import tqdm
-from radiomics import featureextractor
 import logging
 
 logger = logging.getLogger("radiomics.glcm")
